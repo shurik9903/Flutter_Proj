@@ -1,4 +1,8 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+
+import '../modules/RegistrationFetch.dart';
 
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({super.key});
@@ -8,6 +12,12 @@ class RegistrationPage extends StatefulWidget {
 }
 
 class _RegistrationPageState extends State<RegistrationPage> {
+  String email = "";
+  String login = "";
+  String password = "";
+  String password2 = "";
+  String msg = "";
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -19,26 +29,47 @@ class _RegistrationPageState extends State<RegistrationPage> {
               children: [
                 Wrap(
                   runSpacing: 10,
-                  children: const [
+                  children: [
                     TextField(
+                      onChanged: (value) {
+                        setState(() {
+                          login = value;
+                        });
+                      },
                       decoration: InputDecoration(
                           border: OutlineInputBorder(), labelText: 'Логин'),
                     ),
                     TextField(
+                      onChanged: (value) {
+                        setState(() {
+                          email = value;
+                        });
+                      },
                       decoration: InputDecoration(
                           border: OutlineInputBorder(), labelText: 'Почта'),
                     ),
                     TextField(
+                      onChanged: (value) {
+                        setState(() {
+                          password = value;
+                        });
+                      },
                       obscureText: true,
                       decoration: InputDecoration(
                           border: OutlineInputBorder(), labelText: 'Пароль'),
                     ),
                     TextField(
+                      onChanged: (value) {
+                        setState(() {
+                          password2 = value;
+                        });
+                      },
                       obscureText: true,
                       decoration: InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: 'Повторить пароль'),
                     ),
+                    Text(msg),
                   ],
                 ),
                 Row(
@@ -50,8 +81,15 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       child: const Text("Назад"),
                     ),
                     TextButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/login');
+                      onPressed: () async {
+                        registrationFetch(login, email, password, password2)
+                            .then((value) {
+                          setState(() {
+                            msg = value;
+                          });
+                        }).catchError((error) {
+                          msg = error.toString();
+                        });
                       },
                       child: const Text("Регистрация"),
                     ),

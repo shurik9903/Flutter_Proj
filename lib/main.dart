@@ -1,6 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'modules/RoutePage.dart';
 import 'theme/ThemeFactory.dart';
+
+class SelectTheme extends ChangeNotifier {
+  EnumTheme _enumTheme = EnumTheme.dark;
+
+  set theme(EnumTheme theme) {
+    _enumTheme = theme;
+    notifyListeners();
+  }
+
+  EnumTheme get theme => _enumTheme;
+
+  void change() {
+    if (_enumTheme == EnumTheme.dark) {
+      _enumTheme = EnumTheme.light;
+    } else {
+      _enumTheme = EnumTheme.dark;
+    }
+    notifyListeners();
+  }
+}
 
 void main() {
   runApp(const MyApp());
@@ -14,47 +35,50 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  EnumTheme enumTheme = EnumTheme.dark;
-  EnumPage enumPage = EnumPage.none;
+  final SelectTheme _selectTheme = SelectTheme();
+  EnumPage _enumPage = EnumPage.none;
 
   @override
   Widget build(BuildContext context) {
     RoutePageFactory pageFactory = RoutePageFactory();
     ThemeFactory themeFactory = ThemeFactory();
 
-    return MaterialApp(
-      initialRoute: '/login',
-      // routes: {
-      //   '/login': (context) => pageFactory.pageCreator(EnumPage.login),
-      //   '/registration': (context) =>
-      //       pageFactory.pageCreator(EnumPage.registration),
-      //   '/work': (context) => pageFactory.pageCreator(EnumPage.work),
-      // },
-      title: 'Table App',
-      theme: themeFactory.themeCreator(enumTheme),
-      onGenerateRoute: (settings) {
-        var path = settings.name?.split('/');
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => _selectTheme,
+        )
+      ],
+      builder: (context, child) {
+        return MaterialApp(
+          initialRoute: '/login',
+          title: 'Table App',
+          theme: themeFactory.themeCreator(context.watch<SelectTheme>().theme),
+          onGenerateRoute: (settings) {
+            var path = settings.name?.split('/');
 
-        switch (path?[1]) {
-          case "login":
-            enumPage = EnumPage.login;
-            break;
-          case "registration":
-            enumPage = EnumPage.registration;
-            break;
-          case "work":
-            enumPage = EnumPage.work;
-            break;
-          default:
-            enumPage = EnumPage.none;
-            break;
-        }
+            switch (path?[1]) {
+              case "login":
+                _enumPage = EnumPage.login;
+                break;
+              case "registration":
+                _enumPage = EnumPage.registration;
+                break;
+              case "work":
+                _enumPage = EnumPage.work;
+                break;
+              default:
+                _enumPage = EnumPage.none;
+                break;
+            }
 
-        return MaterialPageRoute(
-          builder: (context) => Scaffold(
-            body: pageFactory.pageCreator(enumPage),
-          ),
-          settings: settings,
+            return MaterialPageRoute(
+              builder: (context) => Scaffold(
+                body: pageFactory.pageCreator(_enumPage),
+              ),
+              settings: settings,
+            );
+          },
         );
       },
     );

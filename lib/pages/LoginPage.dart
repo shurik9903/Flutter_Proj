@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_proj/modules/LoginFetch.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -8,6 +11,10 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  String login = "";
+  String password = "";
+  String msg = "";
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -19,24 +26,42 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 Wrap(
                   runSpacing: 10,
-                  children: const [
+                  children: [
                     TextField(
-                      decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Логин/Почта'),
+                      onChanged: (value) {
+                        setState(() {
+                          login = value;
+                        });
+                      },
+                      decoration: const InputDecoration(
+                          border: OutlineInputBorder(), labelText: 'Логин'),
                     ),
                     TextField(
+                      onChanged: (value) {
+                        setState(() {
+                          password = value;
+                        });
+                      },
                       obscureText: true,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                           border: OutlineInputBorder(), labelText: 'Пароль'),
                     ),
+                    Text(msg)
                   ],
                 ),
                 Row(
                   children: [
                     TextButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/work');
+                      onPressed: () async {
+                        loginFetch(login, password).then((value) {
+                          Navigator.pushNamed(context, '/work');
+                        }).catchError((error) {
+                          setState(() {
+                            msg = error.toString();
+                          });
+                        });
+
+                        // Navigator.pushNamed(context, '/work');
                       },
                       child: const Text("Вход"),
                     ),
