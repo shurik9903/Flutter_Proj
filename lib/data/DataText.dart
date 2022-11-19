@@ -12,7 +12,7 @@ class DataText {
         _otherName = otherName,
         _color = color;
 
-  set name(String name) => _name;
+  set name(String name) => _name = name;
   String get name => _name;
 
   set addOtherName(String otherName) {
@@ -21,6 +21,6 @@ class DataText {
 
   List<String> get otherName => _otherName;
 
-  set color(Color color) => _color;
+  set color(Color color) => _color = color;
   Color get color => _color;
 }

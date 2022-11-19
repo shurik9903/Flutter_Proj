@@ -8,15 +8,15 @@ Future<dynamic> registrationFetch(
   var response = await http.post(
       Uri.parse('http://localhost:8080/Library/api/registration/'),
       headers: {
-        "Content-Type": "application/json;charset=utf-8",
+        "Content-Type": "application/json; charset=UTF-8",
         "Accept": "application/json",
       },
-      body: {
+      body: jsonEncode(<String, String>{
         'email': email,
         'username': login,
         'password': password,
         'password2': password2
-      });
+      }));
 
   if (response.statusCode == 200) {
     var data = response.body;

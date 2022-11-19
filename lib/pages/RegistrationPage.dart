@@ -36,7 +36,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                           login = value;
                         });
                       },
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                           border: OutlineInputBorder(), labelText: 'Логин'),
                     ),
                     TextField(
@@ -45,7 +45,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                           email = value;
                         });
                       },
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                           border: OutlineInputBorder(), labelText: 'Почта'),
                     ),
                     TextField(
@@ -55,7 +55,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         });
                       },
                       obscureText: true,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                           border: OutlineInputBorder(), labelText: 'Пароль'),
                     ),
                     TextField(
@@ -65,7 +65,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         });
                       },
                       obscureText: true,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: 'Повторить пароль'),
                     ),

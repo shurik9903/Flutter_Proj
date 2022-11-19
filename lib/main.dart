@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_proj/data/UserData.dart';
 import 'package:provider/provider.dart';
 import 'modules/RoutePage.dart';
 import 'theme/ThemeFactory.dart';
@@ -37,6 +38,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final SelectTheme _selectTheme = SelectTheme();
   EnumPage _enumPage = EnumPage.none;
+  // final UserData_class _userdata = UserData_class();
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +49,10 @@ class _MyAppState extends State<MyApp> {
       providers: [
         ChangeNotifierProvider(
           create: (context) => _selectTheme,
-        )
+        ),
+        // ChangeNotifierProvider(
+        //   create: (context) => _userdata,
+        // )
       ],
       builder: (context, child) {
         return MaterialApp(
