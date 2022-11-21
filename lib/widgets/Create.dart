@@ -1,25 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:flutter_proj/data/DataDescript.dart';
 import 'package:flutter_proj/modules/DescriptionFetch.dart';
 
+import '../data/JSONData.dart';
 import '../theme/AppThemeDefault.dart';
 
-class Create extends StatefulWidget {
-  const Create({super.key});
+class DescriptCreate extends StatefulWidget {
+  String? name;
+  List<String>? otherName;
+  List<Image>? images;
+  String? text;
+  Color? pickerColor;
+  DescriptCreate(
+      {super.key,
+      this.name,
+      this.otherName,
+      this.images,
+      this.text,
+      this.pickerColor});
 
   @override
-  State<Create> createState() => _CreateState();
+  State<DescriptCreate> createState() => _DescriptState();
 }
 
-class _CreateState extends State<Create> {
-  Color pickerColor = const Color.fromARGB(255, 255, 255, 255);
+class _DescriptState extends State<DescriptCreate> {
+  late String name;
+  late List<String> otherName;
+  late List<Image> images;
+  late String text;
+  late Color pickerColor;
+  String msg = "";
 
-  String name = '';
-  List<String> otherName = [];
-  List<Image> images = [];
-  String text = '';
-  String msg = '';
+  @override
+  void initState() {
+    super.initState();
+
+    setState(() {
+      name = widget.name ?? "";
+      otherName = widget.otherName ?? [];
+      images = widget.images ?? [];
+      text = widget.text ?? "";
+      pickerColor =
+          widget.pickerColor ?? const Color.fromARGB(255, 255, 255, 255);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,14 +72,18 @@ class _CreateState extends State<Create> {
                       border: Border(
                           bottom: BorderSide(color: appTheme(context).mColor3)),
                     ),
-                    child: const Text("Имя")),
+                    child: const Text(
+                      "Имя",
+                    )),
                 Expanded(
                   child: Container(
                     margin: const EdgeInsets.only(
                       left: 5,
                       right: 5,
                     ),
-                    child: TextField(
+                    child: TextFormField(
+                      style: TextStyle(color: pickerColor),
+                      initialValue: name,
                       onChanged: (value) {
                         setState(() {
                           name = value;
@@ -95,7 +123,8 @@ class _CreateState extends State<Create> {
                       left: 5,
                       right: 5,
                     ),
-                    child: TextField(
+                    child: TextFormField(
+                      initialValue: otherName.join(","),
                       onChanged: (value) {
                         setState(() {
                           otherName = value.split(',');
@@ -131,15 +160,15 @@ class _CreateState extends State<Create> {
                     child: const Text("Изображения"),
                   ),
                   Column(
-                    children: [],
+                    children: images,
                   ),
                   SizedBox(
                     width: double.infinity,
                     child: TextButton(
-                      onPressed: () async {},
-                      child: Text(
-                          style: TextStyle(color: pickerColor),
-                          "Загрузить изображения"),
+                      onPressed: () {
+                        print(pickerColor);
+                      },
+                      child: const Text("Загрузить изображения"),
                     ),
                   ),
                 ],
@@ -171,7 +200,8 @@ class _CreateState extends State<Create> {
                   Expanded(
                     child: SingleChildScrollView(
                       scrollDirection: Axis.vertical,
-                      child: TextField(
+                      child: TextFormField(
+                        initialValue: text,
                         onChanged: (value) {
                           setState(() {
                             text = value;
@@ -199,6 +229,7 @@ class _CreateState extends State<Create> {
               onPressed: () async {
                 await showColorDialogWindow(context).then((color) {
                   setState(() {
+                    print(color as Color);
                     pickerColor = color as Color;
                   });
                 });
@@ -206,7 +237,7 @@ class _CreateState extends State<Create> {
               child: Text(style: TextStyle(color: pickerColor), "Задать цвет"),
             ),
           ),
-          Text(''),
+          Text(msg),
           TextButton(
             style: ButtonStyle(
               backgroundColor: MaterialStateProperty.all<Color>(

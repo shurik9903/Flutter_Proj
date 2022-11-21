@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_proj/data/DataTitle.dart';
+import 'package:flutter_proj/data/JSONData.dart';
 import 'package:flutter_proj/data/UserData.dart';
 import 'package:flutter_proj/main.dart';
+import 'package:flutter_proj/modules/TitleFetch.dart';
 import 'package:flutter_proj/widgets/SidePanel.dart';
 import 'package:flutter_proj/widgets/WEBDialog.dart';
 import 'package:provider/provider.dart';
@@ -21,8 +24,26 @@ class _WorkPageState extends State<WorkPage> {
       Theme.of(context).appDefault();
 
   final SelectText _selectText = SelectText();
+  final DataTitle _dataTitle = DataTitle();
   List<TextSpan> _parseText = [];
   List<String> person = [''];
+
+  @override
+  void initState() {
+    super.initState();
+    () async {
+      await getTitleFetch("Test").then((value) {
+        setState(() {
+          if (value is TitleData) {
+            _dataTitle.id = value.titleID ?? "";
+            _dataTitle.title = value.title ?? "";
+          }
+        });
+      }).catchError((error) {
+        print(error);
+      });
+    }();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +52,9 @@ class _WorkPageState extends State<WorkPage> {
         providers: [
           ChangeNotifierProvider(
             create: (context) => _selectText,
+          ),
+          ChangeNotifierProvider(
+            create: (context) => _dataTitle,
           ),
         ],
         builder: (context, child) {
@@ -74,6 +98,7 @@ class _WorkPageState extends State<WorkPage> {
                   },
                   icon: const Icon(Icons.palette),
                 ),
+                Text(context.watch<DataTitle>().title),
                 IconButton(
                     onPressed: () async {
                       await showDialogWindow(context).then((value) {
