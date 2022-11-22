@@ -43,6 +43,8 @@ class DataDescript {
   String? text = "";
   Color? color = const Color.fromARGB(255, 0, 0, 0);
   String? title = "";
+  String? userid = "";
+  String? titleid = "";
   String? msg = "";
 
   DataDescript.empty();
@@ -55,6 +57,8 @@ class DataDescript {
       this.text,
       this.color,
       this.title,
+      this.userid,
+      this.titleid,
       this.msg});
 
   factory DataDescript.fromJson(Map<String, dynamic> data) {
@@ -66,6 +70,8 @@ class DataDescript {
     final text = data['text'] as String?;
     final color = Color(int.parse(data['color']));
     final title = data['title'] as String?;
+    final userid = data['userid'] as String?;
+    final titleid = data['titleid'] as String?;
     final msg = data['Msg'] as String?;
 
     return DataDescript(
@@ -76,11 +82,12 @@ class DataDescript {
         text: text,
         color: color,
         title: title,
+        userid: userid,
+        titleid: titleid,
         msg: msg);
   }
 
   String toJson() {
-    print(color?.value.toString() ?? "");
     return jsonEncode(<String, String>{
       "id": id ?? '',
       "name": name ?? '',
@@ -88,7 +95,9 @@ class DataDescript {
       "images": jsonEncode(images),
       "text": text ?? '',
       "color": color?.value.toString() ?? "",
-      "title": title ?? ''
+      "title": title ?? '',
+      "userid": userid ?? '',
+      "titleid": titleid ?? ''
     });
   }
 }

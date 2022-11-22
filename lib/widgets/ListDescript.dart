@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_proj/modules/DescriptionFetch.dart';
-import 'package:flutter_proj/widgets/Create.dart';
+import 'package:flutter_proj/widgets/DescriptCreate.dart';
 import 'package:provider/provider.dart';
 
 import '../data/DataTitle.dart';
@@ -82,11 +82,13 @@ class _ViewDescriptState extends State<ViewDescript> {
     return GestureDetector(
       onTap: () {
         context.read<SelectView>().view = DescriptCreate(
+          id: dataDescript.id,
           name: dataDescript.name,
           otherName: dataDescript.otherName,
           images: dataDescript.images,
           pickerColor: dataDescript.color,
           text: dataDescript.text,
+          action: true,
         );
       },
       child: Container(

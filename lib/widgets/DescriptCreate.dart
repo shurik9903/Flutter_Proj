@@ -1,34 +1,45 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_proj/modules/DescriptionFetch.dart';
+import 'package:provider/provider.dart';
 
+import '../data/DataTitle.dart';
 import '../data/JSONData.dart';
 import '../theme/AppThemeDefault.dart';
 
 class DescriptCreate extends StatefulWidget {
+  String? id;
   String? name;
   List<String>? otherName;
   List<Image>? images;
   String? text;
   Color? pickerColor;
+  bool? action;
+
   DescriptCreate(
       {super.key,
+      this.id,
       this.name,
       this.otherName,
       this.images,
       this.text,
-      this.pickerColor});
+      this.pickerColor,
+      this.action});
 
   @override
   State<DescriptCreate> createState() => _DescriptState();
 }
 
 class _DescriptState extends State<DescriptCreate> {
+  late String id;
   late String name;
   late List<String> otherName;
   late List<Image> images;
   late String text;
   late Color pickerColor;
+  late bool action;
   String msg = "";
 
   @override
@@ -36,12 +47,14 @@ class _DescriptState extends State<DescriptCreate> {
     super.initState();
 
     setState(() {
+      id = widget.id ?? "";
       name = widget.name ?? "";
       otherName = widget.otherName ?? [];
       images = widget.images ?? [];
       text = widget.text ?? "";
       pickerColor =
           widget.pickerColor ?? const Color.fromARGB(255, 255, 255, 255);
+      action = widget.action ?? false;
     });
   }
 
@@ -251,22 +264,41 @@ class _DescriptState extends State<DescriptCreate> {
             ),
             onPressed: () async {
               DataDescript data = DataDescript(
-                  name: name,
-                  otherName: otherName,
-                  images: images,
-                  color: pickerColor,
-                  text: text,
-                  title: "Test");
+                id: id,
+                name: name,
+                otherName: otherName,
+                images: images,
+                color: pickerColor,
+                text: text,
+                title: "Test",
+                titleid: context.read<DataTitle>().id,
+              );
 
-              descriptionFetch(data).then((value) {
-                setState(() {
-                  msg = value;
+              if (!action) {
+                await addDescriptionFetch(data).then((value) {
+                  setState(() {
+                    msg = value;
+                  });
+                }).catchError((error) {
+                  setState(() {
+                    msg = error.toString();
+                  });
                 });
-              }).catchError((error) {
-                msg = error.toString();
-              });
+              }
+
+              if (action) {
+                await putDescriptionFetch(data).then((value) {
+                  setState(() {
+                    msg = value;
+                  });
+                }).catchError((error) {
+                  setState(() {
+                    msg = error.toString();
+                  });
+                });
+              }
             },
-            child: const Text('OK'),
+            child: Text(action ? "Изменить" : "Добавить"),
           ),
         ],
       ),

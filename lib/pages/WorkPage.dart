@@ -1,9 +1,14 @@
+import 'dart:js';
+
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_proj/data/DataTitle.dart';
 import 'package:flutter_proj/data/JSONData.dart';
 import 'package:flutter_proj/data/UserData.dart';
 import 'package:flutter_proj/main.dart';
+import 'package:flutter_proj/modules/DescriptionFetch.dart';
 import 'package:flutter_proj/modules/TitleFetch.dart';
+import 'package:flutter_proj/widgets/DescriptCreate.dart';
 import 'package:flutter_proj/widgets/SidePanel.dart';
 import 'package:flutter_proj/widgets/WEBDialog.dart';
 import 'package:provider/provider.dart';
@@ -23,7 +28,8 @@ class _WorkPageState extends State<WorkPage> {
   AppThemeDefault appTheme(BuildContext context) =>
       Theme.of(context).appDefault();
 
-  final SelectText _selectText = SelectText();
+  // final SelectText _selectText = SelectText();
+  final SelectView _viewWidget = SelectView();
   final DataTitle _dataTitle = DataTitle();
   List<TextSpan> _parseText = [];
   List<String> person = [''];
@@ -51,7 +57,7 @@ class _WorkPageState extends State<WorkPage> {
       child: MultiProvider(
         providers: [
           ChangeNotifierProvider(
-            create: (context) => _selectText,
+            create: (context) => _viewWidget,
           ),
           ChangeNotifierProvider(
             create: (context) => _dataTitle,
@@ -83,7 +89,7 @@ class _WorkPageState extends State<WorkPage> {
                               child: RichText(
                                   text: TextSpan(children: _parseText)),
                             ),
-                            const SidePanel(),
+                            SidePanel(),
                           ],
                         ),
                       )
@@ -102,9 +108,54 @@ class _WorkPageState extends State<WorkPage> {
                 IconButton(
                     onPressed: () async {
                       await showDialogWindow(context).then((value) {
-                        context.read<SelectText>().Text = value as String;
-                        setState(() {
-                          _parseText = parsingText(value);
+                        // context.read<SelectText>().Text = value as String;
+
+                        getDescriptFetch(context.read<DataTitle>().id)
+                            .then((desc) {
+                          if (desc is List<DataDescript>) {
+                            List<DataText> dataText = desc.map((e) {
+                              return DataText(
+                                  e.id ?? "",
+                                  e.name ?? "",
+                                  e.otherName ?? [],
+                                  e.color ??
+                                      Color.fromARGB(255, 255, 255, 255));
+                            }).toList();
+
+                            setState(() {
+                              _parseText = parsingText(
+                                value as String,
+                                dataText = dataText,
+                                (String descriptid) async {
+                                  String? titleid =
+                                      context.read<DataTitle>().id;
+                                  await getDescriptFetch(titleid).then((value) {
+                                    if (value is List<DataDescript>) {
+                                      for (DataDescript desc in value) {
+                                        if (desc.id == descriptid) {
+                                          context.read<SelectView>().view =
+                                              DescriptCreate(
+                                            id: desc.id,
+                                            name: desc.name,
+                                            otherName: desc.otherName,
+                                            images: desc.images,
+                                            pickerColor: desc.color,
+                                            text: desc.text,
+                                            action: true,
+                                          );
+                                          break;
+                                        }
+                                      }
+                                    }
+                                  }).catchError((error) {
+                                    print(error);
+                                  });
+                                },
+                              );
+                            });
+                          }
+                        }).catchError((error) {
+                          print(error);
                         });
                       });
                     },
@@ -118,24 +169,16 @@ class _WorkPageState extends State<WorkPage> {
   }
 }
 
-List<TextSpan> parsingText(String text) {
-  String myText =
-      "- Дорогой Лейлин дулин, это семейная реликвия, дар Лейлин дулин Мага. Когда мой дед помог раненному Магу, тот взамен дал ему это кольцо и сказал, что если кто-то будет Лейлин дулин иметь дар к магии, пусть оденет его, и оно ему поможет вступить в любую гильдию безо всяких усилий. Я дарую его тебе в надежде, что ты станешь гордостью нашей семьи.";
-
-  List<DataText> persons = [
-    DataText(
-        'Лейлин', ['Мага', 'other'], const Color.fromARGB(2500, 255, 0, 0)),
-    DataText('реликвия', [], const Color.fromARGB(196, 47, 61, 255)),
-  ];
-
-  List<dynamic> res = [myText];
+List<TextSpan> parsingText(
+    String text, List<DataText> persons, Function tapCallback) {
+  List<dynamic> res = [text];
 
   for (var person in persons) {
-    for (var names in [...person.otherName, person.name]) {
+    for (var name in [...person.otherName, person.name]) {
       RegExp reg = RegExp('');
       String endReg = '?(ер|ем|ой|ом|ёй|ью|[ыейуаиляью]|)';
 
-      names.split(' ').asMap().forEach((index, name) {
+      name.split(' ').asMap().forEach((index, name) {
         if (index == 0) {
           reg = RegExp(name + endReg);
         } else {
@@ -151,7 +194,7 @@ List<TextSpan> parsingText(String text) {
           element.splitMapJoin(
             reg,
             onMatch: (m) {
-              split.add(person);
+              split.add(DataText(person.descriptid, name, [], person.color));
               return '';
             },
             onNonMatch: (n) {
@@ -175,6 +218,10 @@ List<TextSpan> parsingText(String text) {
   for (var element in res) {
     if (element is DataText) {
       textSpan.add(TextSpan(
+        recognizer: TapGestureRecognizer()
+          ..onTap = () {
+            tapCallback(element.descriptid);
+          },
         text: element.name,
         style: TextStyle(color: element.color),
       ));
